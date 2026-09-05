@@ -1,3 +1,5 @@
+package src;
+
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import java.awt.Color;

@@ -1,3 +1,5 @@
+/*package src;
+
 import java.awt.*;
 
 public class Barra {
@@ -30,7 +32,6 @@ public class Barra {
         }
     }
  
-    /** Desenha a barra com detalhes que lembram uma viga de madeira/metal. */
     public void desenhar(Graphics g) {
         // corpo da barra
         g.setColor(Tema.COR_BARRA);
@@ -46,7 +47,6 @@ public class Barra {
         g.fillOval(x + largura - 8, y + altura / 2 - 2, 4, 4);
     }
  
-    /** Retângulo usado pela colega para checar colisão com a bola. */
     public Rectangle getBounds() {
         return new Rectangle(x, y, largura, altura);
     }
@@ -60,3 +60,5 @@ public class Barra {
         this.velocidade = velocidade;
     }
 }
+
+*/
