@@ -7,6 +7,7 @@ public class Main {
         PainelJogo painel = new PainelJogo();
 
         janela.add(painel);
+        janela.pack();
         janela.setSize(800, 600);
         janela.setResizable(false);
         janela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
