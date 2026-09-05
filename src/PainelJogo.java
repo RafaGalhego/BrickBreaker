@@ -102,19 +102,19 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
 
                 } else if (linha == 1) {
 
-                    cor = Tema.TIJOLO_LARANJA;
+                    cor = Tema.TIJOLO_VERMELHO;
 
                 } else if (linha == 2) {
 
-                    cor = Tema.TIJOLO_MARROM;
+                    cor = Tema.TIJOLO_VERMELHO;
 
                 } else if (linha == 3) {
 
-                    cor = Tema.TIJOLO_CINZA;
+                    cor = Tema.TIJOLO_VERMELHO;
 
                 } else {
 
-                    cor = Tema.TIJOLO_ESCUTO;
+                    cor = Tema.TIJOLO_VERMELHO;
                 }
 
                 //Cria o bloco e adiciona na lista de blocos
@@ -172,10 +172,6 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
         repaint(); //feitas as movimentações e verificações, redesenha o painel em tempo real
     }
 
-    //=====================================================
-    // CONTROLE DO TECLADO
-    //=====================================================
-
     @Override
     public void keyPressed(KeyEvent e) {
 
@@ -210,6 +206,5 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-        //Não será utilizado
     }
 }

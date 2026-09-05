@@ -16,21 +16,9 @@ public class Tema { //Construindo a clase tema que define as cores do jogo
     public static final Color BORDA_BARRA =
         new Color(220, 220, 220);
 
-    //Definicdo ad cores dos tijolos
+    //Definindo as cores dos tijolos
     public static final Color TIJOLO_VERMELHO =
         new Color(178, 34, 34);
-
-    public static final Color TIJOLO_LARANJA =
-        new Color(190, 90, 40);
-
-    public static final Color TIJOLO_MARROM =
-        new Color(130, 70, 40);
-
-    public static final Color TIJOLO_CINZA =
-        new Color(100, 100, 100);
-
-    public static final Color TIJOLO_ESCUTO =
-        new Color(75, 75, 75);
 
     //Bola
     public static final Color BOLA =
