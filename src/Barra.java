@@ -1,4 +1,4 @@
-/*package src;
+package src;
 
 import java.awt.*;
 
@@ -6,16 +6,17 @@ public class Barra {
     private int x, y;
     private int largura, altura;
     private int velocidade;
-    private int limiteEsquerdo, limiteDireito;
+    private int limiteEsquerdo = 0;
 
-    public Barra(int x, int y, int largura, int altura, int larguraTela) {
+  public Barra(int x, int y, int largura, int altura) {
+
         this.x = x;
         this.y = y;
+
         this.largura = largura;
         this.altura = altura;
-        this.velocidade = 8;
-        this.limiteEsquerdo = 0;
-        this.limiteDireito = larguraTela - largura;
+
+        velocidade = 8;
     }
  
     public void moverEsquerda() {
@@ -25,40 +26,63 @@ public class Barra {
         }
     }
  
-    public void moverDireita() {
+    public void moverDireita(int larguraTela) {
         x += velocidade;
-        if (x > limiteDireito) {
-            x = limiteDireito;
+        if (x + largura > larguraTela) {
+            x = larguraTela - largura;
         }
     }
  
-    public void desenhar(Graphics g) {
-        // corpo da barra
-        g.setColor(Tema.COR_BARRA);
-        g.fillRect(x, y, largura, altura);
- 
-        // borda
-        g.setColor(Tema.COR_BARRA_BORDA);
-        g.drawRect(x, y, largura, altura);
- 
-        // "parafusos" nas pontas, para reforçar a estética de construção
-        g.setColor(Tema.COR_BARRA_DETALHE);
-        g.fillOval(x + 4, y + altura / 2 - 2, 4, 4);
-        g.fillOval(x + largura - 8, y + altura / 2 - 2, 4, 4);
+     public void desenhar(Graphics g) {
+
+        //Barra
+        g.setColor(Tema.BARRA);
+
+        g.fillRoundRect(
+                x,
+                y,
+                largura,
+                altura,
+                10,
+                10
+        );
+
+        //Borda
+        g.setColor(Tema.BORDA_BARRA);
+
+        g.drawRoundRect(
+                x,
+                y,
+                largura,
+                altura,
+                10,
+                10
+        );
     }
- 
+
     public Rectangle getBounds() {
-        return new Rectangle(x, y, largura, altura);
+
+        return new Rectangle(
+                x,
+                y,
+                largura,
+                altura
+        );
     }
- 
-    public int getX() { return x; }
-    public int getY() { return y; }
-    public int getLargura() { return largura; }
-    public int getAltura() { return altura; }
- 
-    public void setVelocidade(int velocidade) {
-        this.velocidade = velocidade;
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getLargura() {
+        return largura;
+    }
+
+    public int getAltura() {
+        return altura;
     }
 }
-
-*/
