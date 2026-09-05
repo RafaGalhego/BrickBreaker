@@ -1,14 +1,21 @@
 package src;
 
-import java.awt.*;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 
 public class Barra {
-    private int x, y;
-    private int largura, altura;
+    private int x;
+    private int y;
+    private int largura;
+    private int altura;
     private int velocidade;
-    private int limiteEsquerdo = 0;
 
-  public Barra(int x, int y, int largura, int altura) {
+
+    public Barra(
+            int x,
+            int y,
+            int largura,
+            int altura) {
 
         this.x = x;
         this.y = y;
@@ -18,24 +25,33 @@ public class Barra {
 
         velocidade = 8;
     }
- 
+
+
+    //move para esquerda
     public void moverEsquerda() {
         x -= velocidade;
-        if (x < limiteEsquerdo) {
-            x = limiteEsquerdo;
+
+        //limite
+        if (x < 0) {
+            x = 0;
         }
     }
- 
+
+
+    //move para direita
     public void moverDireita(int larguraTela) {
         x += velocidade;
+
+        //limite direito
         if (x + largura > larguraTela) {
+
             x = larguraTela - largura;
         }
     }
- 
-     public void desenhar(Graphics g) {
 
-        //Barra
+
+    //desenha a barra
+    public void desenhar(Graphics g) {
         g.setColor(Tema.BARRA);
 
         g.fillRoundRect(
@@ -47,7 +63,6 @@ public class Barra {
                 10
         );
 
-        //Borda
         g.setColor(Tema.BORDA_BARRA);
 
         g.drawRoundRect(
@@ -60,15 +75,18 @@ public class Barra {
         );
     }
 
+
+    //area de colisão da barra
     public Rectangle getBounds() {
 
         return new Rectangle(
-                x,
-                y,
-                largura,
-                altura
+            x,
+            y,
+            largura,
+            altura
         );
     }
+
 
     public int getX() {
         return x;
