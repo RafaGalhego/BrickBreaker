@@ -34,8 +34,12 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
     private List<Bloco> blocos;
     private List<Particula> particulas;
 
+    private int pontuacao; //Atualiza a pontuação do jogador, que aumenta quando ele destrói blocos
     private boolean jogoAtivo;
     private boolean moverEsquerda, moverDireita;
+    
+    //Indica se o jogador venceu o jogo
+    private boolean vitoria;
 
    //Inicializa o painel do jogo, configurando tamanho, cor de fundo, eventos de teclado e criando os elementos do jogo 
     public PainelJogo() {
@@ -49,7 +53,9 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
         blocos = criarBlocos();
         particulas = new ArrayList<>();
 
+        pontuacao = 0;        //Inicializa a pontuação
         jogoAtivo = true;
+        vitoria = false; 
 
         timer = new Timer(16, this); //ajuste para 60 FPS
         timer.start();
@@ -145,16 +151,22 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
 
         g.setFont(Tema.FONTE_HUD);
         g.setColor(Tema.TEXTO);
+
+        g.drawString("PONTOS: " + pontuacao, 26, 43);
     }
 
-    //Desenha a tela de fim de jogo 
+    //Desenha a tela de fim de jogo (Game Over ou Vitória)
     private void desenharFimDeJogo(Graphics2D g) {
         g.setColor(new Color(0, 0, 0, 160));
         g.fillRect(0, 0, LARGURA_TELA, ALTURA_TELA);
 
         g.setFont(Tema.FONTE_TITULO);
         g.setColor(Tema.TEXTO_CLARO);
-        g.drawString("FIM DE JOGO", LARGURA_TELA / 2 - 110, ALTURA_TELA / 2);
+        
+        //Mensagem de fim de jogo depende se o jogador venceu ou perdeu
+        String mensagem = vitoria ? "VITÓRIA!" : "GAME OVER";
+        int xPos = LARGURA_TELA / 2 - (mensagem.length() * 15) / 2; //centraliza aproximadamente
+        g.drawString(mensagem, xPos, ALTURA_TELA / 2);
     }
 
     //Atualiza a posição da barra e das particulas 
@@ -163,7 +175,19 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
         if (jogoAtivo) {
             if (moverEsquerda) barra.moverEsquerda();
             if (moverDireita) barra.moverDireita(LARGURA_TELA);
-
+            
+            //verifica se todos os blocos foram destruídos
+            boolean todosDestruidos = true;
+            for (Bloco b : blocos) {
+                if (b.estaAtivo()) {
+                    todosDestruidos = false;
+                    break;
+                }
+            }
+            if (todosDestruidos) {
+                jogoAtivo = false;
+                vitoria = true;
+            }
         }
 
         atualizarParticulas();
@@ -181,7 +205,16 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
                 bounds.y + bounds.height / 2
         );
 
+        //soma os pontos do bloco antes de destruir
+        pontuacao += b.getPontos();
+
         b.destruir();
+    }
+
+    //método público para ser chamado a bola cair ===========Pode chamar esse Rafa ou fazer outro tbm=======
+    public void gameOver() {
+        jogoAtivo = false;
+        vitoria = false;
     }
 
     //Cria partículas de poeira no local onde o bloco foi destruído
