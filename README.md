@@ -9,7 +9,7 @@
 ![Status](https://img.shields.io/badge/status-concluído-brightgreen)
 ![Java](https://img.shields.io/badge/Java-17-blue)
 ![Swing](https://img.shields.io/badge/Swing-AWT-orange)
-![GitHub last commit](https://img.shields.io/github/last-commit/Jana-Carvalho/BrickBreaker)
+![GitHub last commit](https://img.shields.io/github/last-commit/RafaGalhego/BrickBreaker)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 ## 📖 Sobre o projeto
@@ -34,16 +34,16 @@ O projeto utiliza **Java Swing** e **AWT** para a interface gráfica, aplicando 
 ## 🚀 Como executar
 
 1. **Clone o repositório** (ou baixe os arquivos):
-     git clone https://github.com/seu-usuario/BrickBreaker.git
+    - git clone https://github.com/seu-usuario/BrickBreaker.git
 
 2. Acesse a pasta do projeto
-    cd BrickBreaker
+    - cd BrickBreaker
 
 3. Compile todos os arquivos Java
-    javac -d bin src/*.java
+    - javac -d bin src/*.java
 
 4. execute o jog
-    java -cp bin Main
+    - java -cp bin Main
 
 ## Tecnoclogias utilizadas 
 
