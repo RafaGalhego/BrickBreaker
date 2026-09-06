@@ -34,7 +34,7 @@ O projeto utiliza **Java Swing** e **AWT** para a interface gráfica, aplicando 
 ## 🚀 Como executar
 
 1. **Clone o repositório** (ou baixe os arquivos):
-    - git clone https://github.com/seu-usuario/BrickBreaker.git
+    - git clone https://github.com/RafaGalhego/BrickBreaker.git
 
 2. Acesse a pasta do projeto
     - cd BrickBreaker
