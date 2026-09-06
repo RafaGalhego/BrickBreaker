@@ -1,5 +1,3 @@
-package src;
-
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
@@ -73,6 +71,12 @@ public class Barra {
                 10,
                 10
         );
+
+        //detalhes de parafusos
+        g.setColor(Tema.DETALHE_BARRA);
+
+        g.fillOval(x + 6, y + altura / 2 - 2, 4, 4);
+        g.fillOval(x + largura - 10, y + altura / 2 - 2, 4, 4);
     }
 
 
