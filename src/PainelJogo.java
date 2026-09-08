@@ -188,9 +188,21 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
                 bola.atualizar();
                 bola.colisoesCenario(LARGURA_TELA);
 
+                //inverte o sentido ao colidir com a barra
                 if (bola.getBounds().intersects(barra.getBounds())) {
-                    bola.inverterY(); //inverte o sentido ao colidir com a barra
+                    bola.inverterY(); 
                 }   
+
+                //destroi blocos ao colidir com eles
+                for (Bloco b : blocos) {
+                    if (b.estaAtivo() && bola.getBounds().intersects(b.getBounds())) {
+                        
+                        destruirBloco(b);
+                        bola.inverterY(); //inverte o sentido ao colidir com o bloco
+                        
+                        break;
+                    }
+                }
             }
 
             if (bola.getY() > ALTURA_TELA) {
