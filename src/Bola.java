@@ -18,8 +18,8 @@ public class Bola {
         this.largura = largura;
         this.altura = altura;
 
-        this.velX = 4;
-        this.velY = -5;
+        this.velX = 6;
+        this.velY = -7;
 
         this.emMovimento = false;
     }
@@ -99,6 +99,6 @@ public class Bola {
     public void resetBola(int xInicial, int yInicial) {
         this.x = xInicial;
         this.y = yInicial;
-        this.velY = -5;
+        this.velY = -7;
     }
 }

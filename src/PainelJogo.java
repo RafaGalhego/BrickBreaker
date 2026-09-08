@@ -172,7 +172,17 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
         //Mensagem de fim de jogo depende se o jogador venceu ou perdeu
         String mensagem = vitoria ? "VITÓRIA!" : "GAME OVER";
         int xPos = LARGURA_TELA / 2 - (mensagem.length() * 15) / 2; //centraliza aproximadamente
-        g.drawString(mensagem, xPos, ALTURA_TELA / 2);
+        g.drawString(mensagem, xPos, ALTURA_TELA / 2 - 20);
+
+        //instruções para reiniciar
+        g.setFont(Tema.FONTE_HUD); 
+        g.setColor(Tema.TEXTO_CLARO);
+        
+        String op1 = "Pressione [R] para Reiniciar";
+        String op2 = "Pressione [ESC] para Sair";
+
+        g.drawString(op1, LARGURA_TELA / 2 - (op1.length() * 4), ALTURA_TELA / 2 + 40);
+        g.drawString(op2, LARGURA_TELA / 2 - (op2.length() * 4), ALTURA_TELA / 2 + 70);
     }
 
     //Atualiza a posição da barra e das particulas 
@@ -250,6 +260,22 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
         vitoria = false;
     }
 
+    //opção disponível ao finalizar a partida
+    public void reiniciarJogo() {
+        pontuacao = 0;
+        vitoria = false;
+        jogoAtivo = true;
+
+        //restaura os blocos
+        blocos = criarBlocos();
+        particulas.clear();
+
+        //retorna a barra e a bola para o estado inicial
+        barra = new Barra(LARGURA_TELA / 2 - 50, ALTURA_TELA - 40, 100, 15);
+        bola = new Bola(0, 0, 20, 20);
+        bola.posicaoInicial(barra);
+    }
+
     //Cria partículas de poeira no local onde o bloco foi destruído
     private void criarPoeira(int x, int y) {
         for (int i = 0; i < 8; i++) {
@@ -274,13 +300,24 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
     //detecta quando as teclas de seta esquerda e direita são pressionadas ou liberadas
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_LEFT) moverEsquerda = true;
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT) moverDireita = true;
+        int tecla = e.getKeyCode();
 
-        //disparar bola
-        if (e.getKeyCode() == KeyEvent.VK_SPACE || e.getKeyCode() == KeyEvent.VK_UP) {
-            bola.lancar();
-        }
+        if (jogoAtivo) {
+            if (tecla == KeyEvent.VK_LEFT) moverEsquerda = true;
+            if (tecla == KeyEvent.VK_RIGHT) moverDireita = true;
+
+            //disparar bola
+            if (tecla == KeyEvent.VK_SPACE || tecla == KeyEvent.VK_UP) {
+                bola.lancar();
+            }
+        } else {
+            if (tecla == KeyEvent.VK_R) {
+                reiniciarJogo();
+            }
+            if (tecla == KeyEvent.VK_ESCAPE) {
+                System.exit(0); // Fecha a aplicação
+            }
+    }
     }
     @Override
     public void keyReleased(KeyEvent e) {
