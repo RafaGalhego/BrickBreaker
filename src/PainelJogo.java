@@ -264,11 +264,7 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
             } else {
                 bola.atualizar();
                 bola.colisoesCenario(LARGURA_TELA);
-
-                //inverte o sentido ao colidir com a barra
-                if (bola.getBounds().intersects(barra.getBounds())) {
-                    bola.inverterY(); 
-                }   
+                bola.checarColisaoBarra(barra);
 
                 //destroi blocos ao colidir com eles
                 for (Bloco b : blocos) {
@@ -315,8 +311,14 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
                 bounds.y + bounds.height / 2
         );
 
+        int pontuacaoAnterior = pontuacao;
         //soma os pontos do bloco antes de destruir
         pontuacao += b.getPontos();
+
+        //aumenta a pontuação a cada 100 pts verificando se mudou a centena
+        if ((pontuacao / 100) > (pontuacaoAnterior / 100)) {
+            bola.aumentarVelocidade(0.3); // Incrementa +1 na velocidade
+        }
 
         b.destruir();
     }

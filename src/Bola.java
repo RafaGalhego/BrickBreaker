@@ -2,13 +2,17 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 
 public class Bola {
-    private int x;
-    private int y;
+    private double x;
+    private double y;
     private int largura;
     private int altura;
+
     //velocidades separadas para movimento diagonal
-    private int velX;
-    private int velY;
+    private double velX;
+    private double velY;
+    //armazena a velocidade atual da bolinha, permitindo aumentar gradualmente durante a partida
+    private double velocidadeAtual = 4.5;
+    
     private boolean emMovimento; //0-parada 1-em movimento
     
     public Bola(int x, int y, int largura, int altura) {
@@ -18,8 +22,8 @@ public class Bola {
         this.largura = largura;
         this.altura = altura;
 
-        this.velX = 6;
-        this.velY = -7;
+        this.velX = velocidadeAtual;
+        this.velY = -velocidadeAtual;
 
         this.emMovimento = false;
     }
@@ -27,7 +31,7 @@ public class Bola {
     public void posicaoInicial(Barra barra) {
         if (!emMovimento) {
             //centraliza a bola acima da barra
-            this.x = barra.getX() + (barra.getLargura() / 2) - (this.largura / 2);
+            this.x = barra.getX() + (barra.getLargura() / 2.0) - (this.largura / 2.0);
             this.y = barra.getY() - this.altura;
         }
     }
@@ -52,14 +56,40 @@ public class Bola {
 
     public void colisoesCenario(int larguraTela) {
         //colisão nas paredes, muda o lado
-        if (x <= 0 || x + largura >= larguraTela) {
+        if (x <= 0) {
+            x = 0;
+            inverterX();
+        } else if (x + largura >= larguraTela) {
+            x = larguraTela - largura;
             inverterX();
         }
 
         //colisão com o teto, queda
         if (y <= 0) {
+            y = 0;
             inverterY();
         }
+    }
+
+    //corrige bug de colisão com a barra (barra e bolinha colidem repetidamente)
+    public void checarColisaoBarra(Barra barra) {
+        if (getBounds().intersects(barra.getBounds())) {
+            //bola só quica se estiver vindo de cima para baixo
+            if (velY > 0) {
+                //ao colidir é reposicionada acima da barra
+                this.y = barra.getY() - this.altura;
+                inverterY();
+            }
+        }
+    }
+
+    //aumenta a velocidade conforme pontuação
+    public void aumentarVelocidade(double incremento) {
+        velocidadeAtual += incremento;
+
+        //mantem os sinais do movimento atual (+ ou -) ao aumentar o valor absoluto
+        velX = (velX >= 0) ? velocidadeAtual : -velocidadeAtual;
+        velY = (velY >= 0) ? velocidadeAtual : -velocidadeAtual;
     }
 
     public void inverterX() {
@@ -71,20 +101,20 @@ public class Bola {
     }
 
     public Rectangle getBounds() {
-        return new Rectangle(x, y, largura, altura);
+        return new Rectangle((int)x, (int)y, largura, altura);
     }
 
     public void desenhar(Graphics g) {
         g.setColor(Tema.BOLA);
-        g.fillOval(x, y, largura, altura);
+        g.fillOval((int)x, (int)y, largura, altura);
     }
 
     public int getX() {
-        return x;
+        return (int)x;
     }
 
     public int getY() {
-        return y;
+        return (int)y;
     }
 
     public int getLargura() {
