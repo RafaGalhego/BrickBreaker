@@ -348,6 +348,9 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
     public void destruirBloco(Bloco b) {
         Rectangle bounds = b.getBounds();
 
+        //audio de colisão com tijolo
+        Audio.tocarSom("/sounds/colisao_bloco.wav");
+
         criarPoeira(
                 bounds.x + bounds.width / 2,
                 bounds.y + bounds.height / 2
