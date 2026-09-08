@@ -38,6 +38,7 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
     private List<Particula> particulas;
 
     private int pontuacao; //Atualiza a pontuação do jogador, que aumenta quando ele destrói blocos
+    private int vidas;
     private boolean jogoAtivo;
     private boolean pausado = false;
     private boolean exibindoAjuda = false;
@@ -62,6 +63,7 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
         particulas = new ArrayList<>();
 
         pontuacao = 0;        //Inicializa a pontuação
+        vidas = 3; //inicia com 3 vidas
         jogoAtivo = true;
         vitoria = false; 
 
@@ -174,6 +176,37 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
         g.setColor(Tema.TEXTO);
 
         g.drawString("PONTOS: " + pontuacao, 26, 43);
+
+        g.setFont(Tema.FONTE_HUD);
+        g.setColor(Color.YELLOW);
+        g.drawString("[H]: Ajuda", 190, 43);
+
+        int xCoracaoInicial = LARGURA_TELA - 40;
+        int yCoracao = 27;
+
+        for (int i = 0; i < 3; i++) {
+            int x = xCoracaoInicial - (i * 32); //espaçamento de 32px entre corações
+
+            if (i < vidas) {
+                //coração Ativo (vermelho)
+                desenharCoracao(g, x, yCoracao, new Color(235, 60, 60), new Color(180, 30, 30));
+            } else {
+                //coração Perdido (cinza)
+                desenharCoracao(g, x, yCoracao, new Color(80, 80, 80, 120), new Color(40, 40, 40, 120));
+            }
+        }
+    }
+
+    private void desenharCoracao(Graphics2D g, int x, int y, Color corPreenchimento, Color corBorda) {
+        g.setColor(corPreenchimento);
+        //círculo esquerdo e direito do topo do coração
+        g.fillOval(x, y, 11, 11);
+        g.fillOval(x + 9, y, 11, 11);
+
+        //triângulo inferior do coração
+        int[] px = { x, x + 20, x + 10 };
+        int[] py = { y + 6, y + 6, y + 19 };
+        g.fillPolygon(px, py, 3);
     }
 
     //Desenha a tela de fim de jogo (Game Over ou Vitória)
@@ -278,8 +311,17 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
                 }
             }
 
+            //queda da bolinha
             if (bola.getY() > ALTURA_TELA) {
-                gameOver();
+                vidas--; //perde uma vida
+
+                if (vidas <= 0) {
+                    gameOver(); //perdeu todas as vidas
+                } else {
+                    //ainda restam vidas, então reseta a bola de volta para a barra
+                    bola.reset();
+                    bola.posicaoInicial(barra);
+                }
             }
             
             //verifica se todos os blocos foram destruídos
@@ -332,6 +374,7 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
     //opção disponível ao finalizar a partida
     public void reiniciarJogo() {
         pontuacao = 0;
+        vidas = 3;
         vitoria = false;
         jogoAtivo = true;
 

@@ -126,9 +126,10 @@ public class Bola {
     }
 
     //volta a bolinha para posição inicial e subindo
-    public void resetBola(int xInicial, int yInicial) {
-        this.x = xInicial;
-        this.y = yInicial;
-        this.velY = -7;
+    public void reset() {
+        this.emMovimento = false;
+        this.velocidadeAtual = 4.5; // Volta para a velocidade inicial padrão
+        this.velX = velocidadeAtual;
+        this.velY = -velocidadeAtual;
     }
 }
