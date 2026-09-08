@@ -23,7 +23,7 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
 
     //largura e altura do painel do jogo
     private final int LARGURA_TELA = 800;
-    private final int ALTURA_TELA = 600;
+    private final int ALTURA_TELA = 565;
 
     private Timer timer;
 
@@ -39,6 +39,9 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
 
     private int pontuacao; //Atualiza a pontuação do jogador, que aumenta quando ele destrói blocos
     private boolean jogoAtivo;
+    private boolean pausado = false;
+    private boolean exibindoAjuda = false;
+    private int tipoConfirmacao = 0; //0-nenhuma, 1-reiniciar, 2-sair
     private boolean moverEsquerda, moverDireita;
     
     //Indica se o jogador venceu o jogo
@@ -117,6 +120,18 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
 
         desenharHud(g2);
 
+        // Overlays e Telas de Estado
+        if (pausado && jogoAtivo && !exibindoAjuda && tipoConfirmacao == 0) {
+            desenharPausa(g2);
+        }
+
+        if (exibindoAjuda) {
+            desenharTelaAjuda(g2);
+        }
+
+        if (tipoConfirmacao != 0) {
+            desenharConfirmacao(g2);
+        }
         if (!jogoAtivo) {
             desenharFimDeJogo(g2);
         }
@@ -185,10 +200,62 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
         g.drawString(op2, LARGURA_TELA / 2 - (op2.length() * 4), ALTURA_TELA / 2 + 70);
     }
 
+    private void desenharPausa(Graphics2D g) {
+        g.setColor(new Color(0, 0, 0, 150));
+        g.fillRect(0, 0, LARGURA_TELA, ALTURA_TELA);
+
+        g.setFont(Tema.FONTE_TITULO);
+        g.setColor(Tema.TEXTO_CLARO);
+
+        //aviso de jogo pausado
+        String msg = "JOGO PAUSADO";
+        g.drawString(msg, LARGURA_TELA / 2 - 120, ALTURA_TELA / 2);
+    }
+
+    private void desenharTelaAjuda(Graphics2D g) {
+        g.setColor(new Color(0, 0, 0, 210));
+        g.fillRect(0, 0, LARGURA_TELA, ALTURA_TELA);
+
+        g.setFont(Tema.FONTE_TITULO);
+        g.setColor(Tema.TEXTO_CLARO);
+
+        //titulo dos controles
+        g.drawString("CONTROLES DO JOGO", LARGURA_TELA / 2 - 170, 150);
+
+        g.setFont(Tema.FONTE_HUD);
+        g.setColor(Tema.TEXTO_CLARO);
+
+        int y = 220;
+        g.drawString("Mover Barra: Setas Esquerda / Direita", 220, y); y += 35;
+        g.drawString("Lançar Bola: ESPAÇO ou Seta Cima", 220, y); y += 35;
+        g.drawString("Pausar / Despausar: [ P ]", 220, y); y += 35;
+        g.drawString("Abrir / Fechar Ajuda: [ H ]", 220, y); y += 35;
+        g.drawString("Reiniciar Partida: [ R ]", 220, y); y += 35;
+        g.drawString("Sair do Jogo: [ ESC ]", 220, y); y += 45;
+
+        g.setColor(Tema.PLACA_FUNDO);
+        g.drawString("Pressione [ H ] para voltar ao jogo", LARGURA_TELA / 2 - 150, y);
+    }
+
+    private void desenharConfirmacao(Graphics2D g) {
+        g.setColor(new Color(0, 0, 0, 220));
+        g.fillRect(0, 0, LARGURA_TELA, ALTURA_TELA);
+
+        g.setFont(Tema.FONTE_TITULO);
+        g.setColor(Color.YELLOW);
+
+        String pergunta = (tipoConfirmacao == 1) ? "Deseja REINICIAR a partida?" : "Deseja SAIR do jogo?";
+        g.drawString(pergunta, LARGURA_TELA / 2 - (pergunta.length() * 8), ALTURA_TELA / 2 - 20);
+
+        g.setFont(Tema.FONTE_HUD);
+        g.setColor(Color.WHITE);
+        g.drawString("Pressione [ S ] para Sim ou [ N ] para Não", LARGURA_TELA / 2 - 180, ALTURA_TELA / 2 + 40);
+    }
+
     //Atualiza a posição da barra e das particulas 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (jogoAtivo) {
+        if (jogoAtivo && !pausado && !exibindoAjuda && tipoConfirmacao == 0) {
             if (moverEsquerda) barra.moverEsquerda();
             if (moverDireita) barra.moverDireita(LARGURA_TELA);
 
@@ -302,7 +369,52 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
     public void keyPressed(KeyEvent e) {
         int tecla = e.getKeyCode();
 
-        if (jogoAtivo) {
+        if (tipoConfirmacao != 0) {
+            if (tecla == KeyEvent.VK_S) {
+                if (tipoConfirmacao == 1) {
+                    tipoConfirmacao = 0;
+                    reiniciarJogo();
+                } else if (tipoConfirmacao == 2) {
+                    System.exit(0);
+                }
+            } else if (tecla == KeyEvent.VK_N || tecla == KeyEvent.VK_ESCAPE) {
+                tipoConfirmacao = 0; // Cancela e volta ao jogo
+            }
+            return;
+        }
+
+        if (!jogoAtivo) {
+            if (tecla == KeyEvent.VK_R) {
+                reiniciarJogo();
+            } else if (tecla == KeyEvent.VK_ESCAPE) {
+                System.exit(0);
+            }
+            return;
+        }
+
+        //exibe tela de ajuda
+        if (tecla == KeyEvent.VK_H) {
+            exibindoAjuda = !exibindoAjuda;
+            return;
+        }
+
+        //pausa o jogo
+        if (tecla == KeyEvent.VK_P && jogoAtivo && !exibindoAjuda) {
+            pausado = !pausado;
+            return;
+        }
+
+        //permite sair e reiniciar a qualquer momento (com confirmação)
+        if (tecla == KeyEvent.VK_R) {
+            tipoConfirmacao = 1;
+            return;
+        }
+        if (tecla == KeyEvent.VK_ESCAPE) {
+            tipoConfirmacao = 2;
+            return;
+        }
+        
+        if (jogoAtivo && !pausado && !exibindoAjuda) {
             if (tecla == KeyEvent.VK_LEFT) moverEsquerda = true;
             if (tecla == KeyEvent.VK_RIGHT) moverDireita = true;
 
@@ -310,15 +422,9 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
             if (tecla == KeyEvent.VK_SPACE || tecla == KeyEvent.VK_UP) {
                 bola.lancar();
             }
-        } else {
-            if (tecla == KeyEvent.VK_R) {
-                reiniciarJogo();
-            }
-            if (tecla == KeyEvent.VK_ESCAPE) {
-                System.exit(0); // Fecha a aplicação
-            }
+        }
     }
-    }
+    
     @Override
     public void keyReleased(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_LEFT) moverEsquerda = false;
