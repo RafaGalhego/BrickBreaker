@@ -30,6 +30,9 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
     //Barra do jogador que se move horizontalmente
     private Barra barra;
 
+    //Bola do jogo, inicia em cima da barra e colide com cenário e blocos
+    private Bola bola;
+
     //Lista de blocos e partículas que serão desenhados no painel do jogo
     private List<Bloco> blocos;
     private List<Particula> particulas;
@@ -50,6 +53,7 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
         addKeyListener(this);
 
         barra = new Barra(LARGURA_TELA / 2 - 50, ALTURA_TELA - 40, 100, 15);
+        bola = new Bola(LARGURA_TELA / 2 - 50, ALTURA_TELA - 40, 20, 20);
         blocos = criarBlocos();
         particulas = new ArrayList<>();
 
@@ -108,6 +112,7 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
         }
 
         barra.desenhar(g2);
+        bola.desenhar(g2);
 
         desenharHud(g2);
 
@@ -175,6 +180,17 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
         if (jogoAtivo) {
             if (moverEsquerda) barra.moverEsquerda();
             if (moverDireita) barra.moverDireita(LARGURA_TELA);
+
+            bola.atualizar();
+            bola.colisoesCenario(LARGURA_TELA);
+
+            if (bola.getBounds().intersects(barra.getBounds())) {
+                bola.inverterY(); //inverte o sentido ao colidir com a barra
+            }   
+
+            if (bola.getY() > ALTURA_TELA) {
+                gameOver();
+            }
             
             //verifica se todos os blocos foram destruídos
             boolean todosDestruidos = true;
@@ -211,7 +227,7 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
         b.destruir();
     }
 
-    //método público para ser chamado a bola cair ===========Pode chamar esse Rafa ou fazer outro tbm=======
+    //método público para ser chamado a bola cair
     public void gameOver() {
         jogoAtivo = false;
         vitoria = false;
