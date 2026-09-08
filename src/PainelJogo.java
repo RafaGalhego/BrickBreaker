@@ -53,7 +53,8 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
         addKeyListener(this);
 
         barra = new Barra(LARGURA_TELA / 2 - 50, ALTURA_TELA - 40, 100, 15);
-        bola = new Bola(LARGURA_TELA / 2 - 50, ALTURA_TELA - 40, 20, 20);
+        bola = new Bola(0, 0, 20, 20);
+        bola.posicaoInicial(barra);
         blocos = criarBlocos();
         particulas = new ArrayList<>();
 
@@ -181,12 +182,16 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
             if (moverEsquerda) barra.moverEsquerda();
             if (moverDireita) barra.moverDireita(LARGURA_TELA);
 
-            bola.atualizar();
-            bola.colisoesCenario(LARGURA_TELA);
+            if (!bola.estaMovendo()) {
+                bola.posicaoInicial(barra);
+            } else {
+                bola.atualizar();
+                bola.colisoesCenario(LARGURA_TELA);
 
-            if (bola.getBounds().intersects(barra.getBounds())) {
-                bola.inverterY(); //inverte o sentido ao colidir com a barra
-            }   
+                if (bola.getBounds().intersects(barra.getBounds())) {
+                    bola.inverterY(); //inverte o sentido ao colidir com a barra
+                }   
+            }
 
             if (bola.getY() > ALTURA_TELA) {
                 gameOver();
@@ -259,6 +264,11 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_LEFT) moverEsquerda = true;
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) moverDireita = true;
+
+        //disparar bola
+        if (e.getKeyCode() == KeyEvent.VK_SPACE || e.getKeyCode() == KeyEvent.VK_UP) {
+            bola.lancar();
+        }
     }
     @Override
     public void keyReleased(KeyEvent e) {

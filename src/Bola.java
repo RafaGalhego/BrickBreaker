@@ -9,6 +9,7 @@ public class Bola {
     //velocidades separadas para movimento diagonal
     private int velX;
     private int velY;
+    private boolean emMovimento; //0-parada 1-em movimento
     
     public Bola(int x, int y, int largura, int altura) {
         this.x = x;
@@ -19,12 +20,34 @@ public class Bola {
 
         this.velX = 4;
         this.velY = -5;
+
+        this.emMovimento = false;
+    }
+
+    public void posicaoInicial(Barra barra) {
+        if (!emMovimento) {
+            //centraliza a bola acima da barra
+            this.x = barra.getX() + (barra.getLargura() / 2) - (this.largura / 2);
+            this.y = barra.getY() - this.altura;
+        }
+    }
+
+    public void lancar() {
+        if (!emMovimento) {
+            emMovimento = true;
+        }
     }
 
     //movimento da bola
     public void atualizar() {
-        x += velX;
-        y += velY;
+        if (emMovimento) {
+            x += velX;
+            y += velY;
+        }
+    }
+
+    public boolean estaMovendo() {
+        return emMovimento;
     }
 
     public void colisoesCenario(int larguraTela) {
