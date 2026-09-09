@@ -23,6 +23,10 @@ public class Tema { //Construindo a classe tema que define as cores do jogo
     public static final Color DETALHE_BARRA =
         new Color(40, 40, 40);
 
+    //Cor da bola
+    public static final Color BOLA =
+        new Color(236, 239, 244);
+
     //Definindo as cores dos tijolos
     public static final Color TIJOLO_VERMELHO =
         new Color(178, 34, 34);

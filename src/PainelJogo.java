@@ -23,19 +23,26 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
 
     //largura e altura do painel do jogo
     private final int LARGURA_TELA = 800;
-    private final int ALTURA_TELA = 600;
+    private final int ALTURA_TELA = 565;
 
     private Timer timer;
 
     //Barra do jogador que se move horizontalmente
     private Barra barra;
 
+    //Bola do jogo, inicia em cima da barra e colide com cenário e blocos
+    private Bola bola;
+
     //Lista de blocos e partículas que serão desenhados no painel do jogo
     private List<Bloco> blocos;
     private List<Particula> particulas;
 
     private int pontuacao; //Atualiza a pontuação do jogador, que aumenta quando ele destrói blocos
+    private int vidas;
     private boolean jogoAtivo;
+    private boolean pausado = false;
+    private boolean exibindoAjuda = false;
+    private int tipoConfirmacao = 0; //0-nenhuma, 1-reiniciar, 2-sair
     private boolean moverEsquerda, moverDireita;
     
     //Indica se o jogador venceu o jogo
@@ -50,10 +57,13 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
         addKeyListener(this);
 
         barra = new Barra(LARGURA_TELA / 2 - 50, ALTURA_TELA - 40, 100, 15);
+        bola = new Bola(0, 0, 20, 20);
+        bola.posicaoInicial(barra);
         blocos = criarBlocos();
         particulas = new ArrayList<>();
 
         pontuacao = 0;        //Inicializa a pontuação
+        vidas = 3; //inicia com 3 vidas
         jogoAtivo = true;
         vitoria = false; 
 
@@ -108,9 +118,22 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
         }
 
         barra.desenhar(g2);
+        bola.desenhar(g2);
 
         desenharHud(g2);
 
+        // Overlays e Telas de Estado
+        if (pausado && jogoAtivo && !exibindoAjuda && tipoConfirmacao == 0) {
+            desenharPausa(g2);
+        }
+
+        if (exibindoAjuda) {
+            desenharTelaAjuda(g2);
+        }
+
+        if (tipoConfirmacao != 0) {
+            desenharConfirmacao(g2);
+        }
         if (!jogoAtivo) {
             desenharFimDeJogo(g2);
         }
@@ -153,6 +176,37 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
         g.setColor(Tema.TEXTO);
 
         g.drawString("PONTOS: " + pontuacao, 26, 43);
+
+        g.setFont(Tema.FONTE_HUD);
+        g.setColor(Color.YELLOW);
+        g.drawString("[H]: Ajuda", 190, 43);
+
+        int xCoracaoInicial = LARGURA_TELA - 40;
+        int yCoracao = 27;
+
+        for (int i = 0; i < 3; i++) {
+            int x = xCoracaoInicial - (i * 32); //espaçamento de 32px entre corações
+
+            if (i < vidas) {
+                //coração Ativo (vermelho)
+                desenharCoracao(g, x, yCoracao, new Color(235, 60, 60), new Color(180, 30, 30));
+            } else {
+                //coração Perdido (cinza)
+                desenharCoracao(g, x, yCoracao, new Color(80, 80, 80, 120), new Color(40, 40, 40, 120));
+            }
+        }
+    }
+
+    private void desenharCoracao(Graphics2D g, int x, int y, Color corPreenchimento, Color corBorda) {
+        g.setColor(corPreenchimento);
+        //círculo esquerdo e direito do topo do coração
+        g.fillOval(x, y, 11, 11);
+        g.fillOval(x + 9, y, 11, 11);
+
+        //triângulo inferior do coração
+        int[] px = { x, x + 20, x + 10 };
+        int[] py = { y + 6, y + 6, y + 19 };
+        g.fillPolygon(px, py, 3);
     }
 
     //Desenha a tela de fim de jogo (Game Over ou Vitória)
@@ -166,15 +220,109 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
         //Mensagem de fim de jogo depende se o jogador venceu ou perdeu
         String mensagem = vitoria ? "VITÓRIA!" : "GAME OVER";
         int xPos = LARGURA_TELA / 2 - (mensagem.length() * 15) / 2; //centraliza aproximadamente
-        g.drawString(mensagem, xPos, ALTURA_TELA / 2);
+        g.drawString(mensagem, xPos, ALTURA_TELA / 2 - 20);
+
+        //instruções para reiniciar
+        g.setFont(Tema.FONTE_HUD); 
+        g.setColor(Tema.TEXTO_CLARO);
+        
+        String op1 = "Pressione [R] para Reiniciar";
+        String op2 = "Pressione [ESC] para Sair";
+
+        g.drawString(op1, LARGURA_TELA / 2 - (op1.length() * 4), ALTURA_TELA / 2 + 40);
+        g.drawString(op2, LARGURA_TELA / 2 - (op2.length() * 4), ALTURA_TELA / 2 + 70);
+    }
+
+    private void desenharPausa(Graphics2D g) {
+        g.setColor(new Color(0, 0, 0, 150));
+        g.fillRect(0, 0, LARGURA_TELA, ALTURA_TELA);
+
+        g.setFont(Tema.FONTE_TITULO);
+        g.setColor(Tema.TEXTO_CLARO);
+
+        //aviso de jogo pausado
+        String msg = "JOGO PAUSADO";
+        g.drawString(msg, LARGURA_TELA / 2 - 120, ALTURA_TELA / 2);
+    }
+
+    private void desenharTelaAjuda(Graphics2D g) {
+        g.setColor(new Color(0, 0, 0, 210));
+        g.fillRect(0, 0, LARGURA_TELA, ALTURA_TELA);
+
+        g.setFont(Tema.FONTE_TITULO);
+        g.setColor(Tema.TEXTO_CLARO);
+
+        //titulo dos controles
+        g.drawString("CONTROLES DO JOGO", LARGURA_TELA / 2 - 170, 150);
+
+        g.setFont(Tema.FONTE_HUD);
+        g.setColor(Tema.TEXTO_CLARO);
+
+        int y = 220;
+        g.drawString("Mover Barra: Setas Esquerda / Direita", 220, y); y += 35;
+        g.drawString("Lançar Bola: ESPAÇO ou Seta Cima", 220, y); y += 35;
+        g.drawString("Pausar / Despausar: [ P ]", 220, y); y += 35;
+        g.drawString("Abrir / Fechar Ajuda: [ H ]", 220, y); y += 35;
+        g.drawString("Reiniciar Partida: [ R ]", 220, y); y += 35;
+        g.drawString("Sair do Jogo: [ ESC ]", 220, y); y += 45;
+
+        g.setColor(Tema.PLACA_FUNDO);
+        g.drawString("Pressione [ H ] para voltar ao jogo", LARGURA_TELA / 2 - 150, y);
+    }
+
+    private void desenharConfirmacao(Graphics2D g) {
+        g.setColor(new Color(0, 0, 0, 220));
+        g.fillRect(0, 0, LARGURA_TELA, ALTURA_TELA);
+
+        g.setFont(Tema.FONTE_TITULO);
+        g.setColor(Color.YELLOW);
+
+        String pergunta = (tipoConfirmacao == 1) ? "Deseja REINICIAR a partida?" : "Deseja SAIR do jogo?";
+        g.drawString(pergunta, LARGURA_TELA / 2 - (pergunta.length() * 8), ALTURA_TELA / 2 - 20);
+
+        g.setFont(Tema.FONTE_HUD);
+        g.setColor(Color.WHITE);
+        g.drawString("Pressione [ S ] para Sim ou [ N ] para Não", LARGURA_TELA / 2 - 180, ALTURA_TELA / 2 + 40);
     }
 
     //Atualiza a posição da barra e das particulas 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (jogoAtivo) {
+        if (jogoAtivo && !pausado && !exibindoAjuda && tipoConfirmacao == 0) {
             if (moverEsquerda) barra.moverEsquerda();
             if (moverDireita) barra.moverDireita(LARGURA_TELA);
+
+            if (!bola.estaMovendo()) {
+                bola.posicaoInicial(barra);
+            } else {
+                bola.atualizar();
+                bola.colisoesCenario(LARGURA_TELA);
+                bola.checarColisaoBarra(barra);
+
+                //destroi blocos ao colidir com eles
+                for (Bloco b : blocos) {
+                    if (b.estaAtivo() && bola.getBounds().intersects(b.getBounds())) {
+                        
+                        destruirBloco(b);
+                        bola.inverterY(); //inverte o sentido ao colidir com o bloco
+                        
+                        break;
+                    }
+                }
+            }
+
+            //queda da bolinha
+            if (bola.getY() > ALTURA_TELA) {
+                vidas--; //perde uma vida
+
+                if (vidas <= 0) {
+                    gameOver(); //perdeu todas as vidas
+                } else {
+                    //ainda restam vidas, então reseta a bola de volta para a barra
+                    bola.reset();
+                    bola.posicaoInicial(barra);
+                }
+            }
             
             //verifica se todos os blocos foram destruídos
             boolean todosDestruidos = true;
@@ -200,21 +348,47 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
     public void destruirBloco(Bloco b) {
         Rectangle bounds = b.getBounds();
 
+        //audio de colisão com tijolo
+        Audio.tocarSom("/sounds/colisao_bloco.wav");
+
         criarPoeira(
                 bounds.x + bounds.width / 2,
                 bounds.y + bounds.height / 2
         );
 
+        int pontuacaoAnterior = pontuacao;
         //soma os pontos do bloco antes de destruir
         pontuacao += b.getPontos();
+
+        //aumenta a pontuação a cada 100 pts verificando se mudou a centena
+        if ((pontuacao / 100) > (pontuacaoAnterior / 100)) {
+            bola.aumentarVelocidade(0.3); // Incrementa +1 na velocidade
+        }
 
         b.destruir();
     }
 
-    //método público para ser chamado a bola cair ===========Pode chamar esse Rafa ou fazer outro tbm=======
+    //método público para ser chamado a bola cair
     public void gameOver() {
         jogoAtivo = false;
         vitoria = false;
+    }
+
+    //opção disponível ao finalizar a partida
+    public void reiniciarJogo() {
+        pontuacao = 0;
+        vidas = 3;
+        vitoria = false;
+        jogoAtivo = true;
+
+        //restaura os blocos
+        blocos = criarBlocos();
+        particulas.clear();
+
+        //retorna a barra e a bola para o estado inicial
+        barra = new Barra(LARGURA_TELA / 2 - 50, ALTURA_TELA - 40, 100, 15);
+        bola = new Bola(0, 0, 20, 20);
+        bola.posicaoInicial(barra);
     }
 
     //Cria partículas de poeira no local onde o bloco foi destruído
@@ -241,9 +415,64 @@ public class PainelJogo extends JPanel implements ActionListener, KeyListener {
     //detecta quando as teclas de seta esquerda e direita são pressionadas ou liberadas
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_LEFT) moverEsquerda = true;
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT) moverDireita = true;
+        int tecla = e.getKeyCode();
+
+        if (tipoConfirmacao != 0) {
+            if (tecla == KeyEvent.VK_S) {
+                if (tipoConfirmacao == 1) {
+                    tipoConfirmacao = 0;
+                    reiniciarJogo();
+                } else if (tipoConfirmacao == 2) {
+                    System.exit(0);
+                }
+            } else if (tecla == KeyEvent.VK_N || tecla == KeyEvent.VK_ESCAPE) {
+                tipoConfirmacao = 0; // Cancela e volta ao jogo
+            }
+            return;
+        }
+
+        if (!jogoAtivo) {
+            if (tecla == KeyEvent.VK_R) {
+                reiniciarJogo();
+            } else if (tecla == KeyEvent.VK_ESCAPE) {
+                System.exit(0);
+            }
+            return;
+        }
+
+        //exibe tela de ajuda
+        if (tecla == KeyEvent.VK_H) {
+            exibindoAjuda = !exibindoAjuda;
+            return;
+        }
+
+        //pausa o jogo
+        if (tecla == KeyEvent.VK_P && jogoAtivo && !exibindoAjuda) {
+            pausado = !pausado;
+            return;
+        }
+
+        //permite sair e reiniciar a qualquer momento (com confirmação)
+        if (tecla == KeyEvent.VK_R) {
+            tipoConfirmacao = 1;
+            return;
+        }
+        if (tecla == KeyEvent.VK_ESCAPE) {
+            tipoConfirmacao = 2;
+            return;
+        }
+        
+        if (jogoAtivo && !pausado && !exibindoAjuda) {
+            if (tecla == KeyEvent.VK_LEFT) moverEsquerda = true;
+            if (tecla == KeyEvent.VK_RIGHT) moverDireita = true;
+
+            //disparar bola
+            if (tecla == KeyEvent.VK_SPACE || tecla == KeyEvent.VK_UP) {
+                bola.lancar();
+            }
+        }
     }
+    
     @Override
     public void keyReleased(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_LEFT) moverEsquerda = false;
