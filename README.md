@@ -55,3 +55,11 @@ O projeto utiliza **Java Swing** e **AWT** para a interface gráfica, aplicando 
 <!-- Adicionar depois isso -->
 ## Fotos do Jogo 
 
+### Tela inicial
+![Tela inicial](imagens/Foto_tela_inicial.jpg)
+
+### Tela de vitória
+![Tela de vitória](imagens/Foto_tela_vitoria.jpg)
+
+### Tela de Game Over
+![Tela de Game Over](imagens/Foto_tela_gameover.jpg)

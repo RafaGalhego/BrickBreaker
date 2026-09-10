@@ -5,5 +5,8 @@
     "java.project.sourcePaths": [
         "src"
     ],
-    "java.project.outputPath": "bin"
+    "java.project.outputPath": "bin",
+
+    // Define UTF-8 como codificação dos arquivos
+    "files.encoding": "utf8"
 }
