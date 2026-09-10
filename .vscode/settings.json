@@ -1,0 +1,9 @@
+{
+    //Configuração do projeto Java no VS Code:
+    //define onde estão os códigos-fonte e onde ficam os arquivos compilados.
+
+    "java.project.sourcePaths": [
+        "src"
+    ],
+    "java.project.outputPath": "bin"
+}
